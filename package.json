@@ -1,0 +1,24 @@
+{
+  "name": "chimee-webrtc-server",
+  "version": "1.0.0",
+  "description": "webrtc",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chimeejs/chimee-webrtc-server.git"
+  },
+  "author": "songguangyu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chimeejs/chimee-webrtc-server/issues"
+  },
+  "homepage": "https://github.com/Chimeejs/chimee-webrtc-server#readme",
+  "devDependencies": {
+    "fastify": "^0.35.5",
+    "mongodb": "^3.0.0-rc0",
+    "ws": "^3.3.2"
+  }
+}
