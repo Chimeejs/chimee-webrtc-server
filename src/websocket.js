@@ -1,22 +1,48 @@
-var WebSocket = require('ws');
+const WebSocket = require('ws');
+const events = require('events');
 
-const wss = new WebSocket.Server({ port: 8576 });
+class WS extends events.EventEmitter{
+  constructor() {
+    super();
+    this.wss = new WebSocket.Server({ port: 8576 });
+    console.log(`websocket listening on 8576`);
+    this.wss.on('connection', (ws, req)=> {
+      ws.on('message', (message)=> {
+        var msg = JSON.parse(message);
+        if(msg.type === 'userInfo') {
+          this.saveMediaInfo(msg.userInfo, ws);
+        } else {
+          this.saveSdp(msg.sdp, ws);
+          this.broadcast(this.wss, ws, msg);
+        }
+      });
+    
+      ws.on('close', ()=>{
+        this.emit('userLeave', ws.userInfo); 
+      })
 
-var saveSdp = function (sdp, ws) {
+      ws.on('error', (err)=> {
+        // this.emit('userLeave', ws.userInfo); 
+      })
+    });
+  }
+
+  saveSdp(sdp, ws) {
     ws.sdp = sdp;
-}
-var responseAnswer = function (sdp, ws) {
-  var message = {type: 'answer',sdp: sdp};
-  message.type = 'answer';
-  ws.send(JSON.stringify(message));
-}
+  }
 
-var saveMediaInfo = function (mediaInfo, ws) {
-  ws.mediaInfo = mediaInfo;
-}
+  responseAnswer(sdp, ws) {
+    let message = {type: 'answer',sdp: sdp};
+    message.type = 'answer';
+    ws.send(JSON.stringify(message));
+  }
 
-var broadcast = function (wss, ws, message) {
-  wss.clients.forEach(function each(client) {
+  saveMediaInfo(userInfo, ws) {
+    this.emit('userInfo', userInfo, ws); 
+  }
+
+  broadcast(wss, ws, message) {
+    wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(message), function (error) {
           if (error) {
@@ -24,21 +50,8 @@ var broadcast = function (wss, ws, message) {
           }
         });
       }
-  });
+    });
+  }
 }
 
-wss.on('connection', function(ws, req) {
-  ws.on('message', function(message) {
-    var msg = JSON.parse(message);
-    if(msg.type === 'mediaInfo') {
-      saveMediaInfo(msg.mediaInfo, ws);
-    } else {
-      saveSdp(msg.sdp, ws);
-      broadcast(wss, ws, msg);
-    }
-  });
-
-  ws.on('close', function() {
-
-  })
-});
+module.exports = WS;

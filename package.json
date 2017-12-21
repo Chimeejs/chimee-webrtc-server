@@ -4,7 +4,9 @@
   "description": "webrtc",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "forever -o start src/index.js",
+    "stop": "forever stopall"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,12 @@
   "homepage": "https://github.com/Chimeejs/chimee-webrtc-server#readme",
   "devDependencies": {
     "fastify": "^0.35.5",
+    "forever": "^0.15.3",
     "mongodb": "^3.0.0-rc0",
     "ws": "^3.3.2"
+  },
+  "dependencies": {
+    "mongodb": "^3.0.0-rc0",
+    "mongoose": "^4.13.7"
   }
 }
