@@ -9,11 +9,22 @@ class WS extends events.EventEmitter{
     this.wss.on('connection', (ws, req)=> {
       ws.on('message', (message)=> {
         var msg = JSON.parse(message);
-        if(msg.type === 'userInfo') {
+        switch(msg.type) {
+          case 'userInfo':
           this.saveMediaInfo(msg.userInfo, ws);
-        } else {
+          break;
+          case 'offer':
           this.saveSdp(msg.sdp, ws);
           this.broadcast(this.wss, ws, msg);
+          break;
+          case 'nodes':
+          this.filterNodeMap[ws.userInfo._id] = msg.nodes;
+          break;
+          default:
+          if(msg) {
+            this.broadcast(this.wss, ws, msg);
+          }
+          break;
         }
       });
     
@@ -22,9 +33,12 @@ class WS extends events.EventEmitter{
       })
 
       ws.on('error', (err)=> {
-        // this.emit('userLeave', ws.userInfo); 
+        this.emit('userLeave', ws.userInfo); 
       })
     });
+    this.filterNodeMap = {
+      
+    }
   }
 
   saveSdp(sdp, ws) {
@@ -42,14 +56,16 @@ class WS extends events.EventEmitter{
   }
 
   broadcast(wss, ws, message) {
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(message), function (error) {
-          if (error) {
-            console.log('Send message error (' + desc + '): ', error);
-          }
-        });
-      }
+    wss.clients.forEach((client)=> {
+      this.filterNodeMap[ws.userInfo._id].forEach((item)=>{
+        if (client.userInfo._id == item._id && client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(message), function (error) {
+            if (error) {
+              console.log('Send message error (' + desc + '): ', error);
+            }
+          });
+        }
+      })
     });
   }
 }

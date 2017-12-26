@@ -26,7 +26,7 @@ ws.on('userLeave', async (userInfo)=>{
 const fastify = require('fastify')();
 // Declare a route
 fastify.get('/getAvailableNodes', async function (request, reply) {
-  const result = await db.find({url: request.query.url, uid: {'$ne': request.query.uid}});
+  const result = await db.find({url: request.query.url, isLive: true, uid: {'$ne': request.query.uid}});
   reply.header('Access-Control-Allow-Origin', '*');
   reply.send(result);
 })
