@@ -19,13 +19,13 @@
   },
   "homepage": "https://github.com/Chimeejs/chimee-webrtc-server#readme",
   "devDependencies": {
-    "fastify": "^0.35.5",
+    "fastify": "^1.13.0",
     "forever": "^0.15.3",
     "mongodb": "^3.0.0-rc0",
-    "ws": "^3.3.2"
+    "ws": "^6.1.0"
   },
   "dependencies": {
     "mongodb": "^3.0.0-rc0",
-    "mongoose": "^4.13.7"
+    "mongoose": "^5.3.10"
   }
 }
